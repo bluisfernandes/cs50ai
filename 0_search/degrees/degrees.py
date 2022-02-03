@@ -91,9 +91,17 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
+    
+    
+    path=[("112384","102"), ("104257","129")]
+    movie_person = set()
+    
+
+    # path.append(movie_person)
+    return path
 
     # TODO
-    raise NotImplementedError
+    # raise NotImplementedError
 
 
 def person_id_for_name(name):
