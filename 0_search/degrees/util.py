@@ -1,3 +1,4 @@
+# creates nodes
 class Node():
     def __init__(self, state, parent, action):
         self.state = state
@@ -5,6 +6,7 @@ class Node():
         self.action = action
 
 
+# Creates a stackFrontier list
 class StackFrontier():
     def __init__(self):
         self.frontier = []
@@ -27,8 +29,8 @@ class StackFrontier():
             return node
 
 
+# queue frontier, difference only in remove
 class QueueFrontier(StackFrontier):
-
     def remove(self):
         if self.empty():
             raise Exception("empty frontier")
@@ -37,11 +39,13 @@ class QueueFrontier(StackFrontier):
             self.frontier = self.frontier[1:]
             return node
 
+
+# list of explored nodes
 class Explored():
     def __init__(self):
-        self.list=[]
+        self.list = []
     
-    def add(self,node):
+    def add(self, node):
         self.list.append(node)
 
     def contains(self, state):

@@ -33,11 +33,6 @@ def load_data(directory):
             else:
                 names[row["name"].lower()].add(row["id"])
 
-    # print("\n######## NAMES ##########\n")
-    # print(names)
-    # print("\n######## PEOPLE ##########\n")
-    # print(people)
-
     # Load movies
     with open(f"{directory}/movies.csv", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -47,8 +42,6 @@ def load_data(directory):
                 "year": row["year"],
                 "stars": set()
             }
-    # print("\n######## MOVIES ##########\n")
-    # print(movies)
 
     # Load stars
     with open(f"{directory}/stars.csv", encoding="utf-8") as f:
@@ -59,10 +52,6 @@ def load_data(directory):
                 movies[row["movie_id"]]["stars"].add(row["person_id"])
             except KeyError:
                 pass
-    # print("\n######## WITH STARS ##########\n")
-    # print(people)
-    # print("\n")
-    # print(movies)
 
 
 def main():
@@ -104,6 +93,7 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
+    # Creates first node, the initial state, initializes the frontier and explored list
     n0 = Node(state=source, parent=None, action=None)
     frontier = QueueFrontier()
     frontier.add(n0)
@@ -111,6 +101,7 @@ def shortest_path(source, target):
     explored = Explored()
     path = []
 
+    # run in frontier list searching the target
     while not frontier.empty():
         n = frontier.remove()
         if n.state == target:
