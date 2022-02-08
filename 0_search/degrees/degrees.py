@@ -1,7 +1,9 @@
 import csv
+from importlib.machinery import FrozenImporter
+from inspect import stack
 import sys
 
-from util import Node, StackFrontier, QueueFrontier
+from util import Node, StackFrontier, QueueFrontier, Explored
 
 # Maps names to a set of corresponding person_ids
 names = {}
@@ -31,6 +33,11 @@ def load_data(directory):
             else:
                 names[row["name"].lower()].add(row["id"])
 
+    # print("\n######## NAMES ##########\n")
+    # print(names)
+    # print("\n######## PEOPLE ##########\n")
+    # print(people)
+
     # Load movies
     with open(f"{directory}/movies.csv", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -40,6 +47,8 @@ def load_data(directory):
                 "year": row["year"],
                 "stars": set()
             }
+    # print("\n######## MOVIES ##########\n")
+    # print(movies)
 
     # Load stars
     with open(f"{directory}/stars.csv", encoding="utf-8") as f:
@@ -50,6 +59,10 @@ def load_data(directory):
                 movies[row["movie_id"]]["stars"].add(row["person_id"])
             except KeyError:
                 pass
+    # print("\n######## WITH STARS ##########\n")
+    # print(people)
+    # print("\n")
+    # print(movies)
 
 
 def main():
@@ -91,17 +104,41 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
+    n0 = Node(state=source, parent=None, action=None)
+    frontier = QueueFrontier()
+    frontier.add(n0)
     
-    
-    path=[("112384","102"), ("104257","129")]
-    movie_person = set()
-    
+    explored = Explored()
+    path = []
 
-    # path.append(movie_person)
+    while not frontier.empty():
+        n = frontier.remove()
+        if n.state == target:
+            # return the solution, with node n
+            break
+            
+        explored.add(n)
+        for node in neighbors_for_person(n.state):
+            # print(node)
+            if not (explored.contains(node[1]) or frontier.contains_state(node[1])):
+                frontier.add(Node(state=node[1], parent=n, action=node[0]))
+
+    if path == None:
+        return None
+
+    path.append((n.action, n.state))
+
+    node = n.parent
+
+    while not node.state == source:
+        if node.state == source:
+            break
+        path.append((node.action, node.state))
+        node = node.parent
+
+    path.reverse()
+
     return path
-
-    # TODO
-    # raise NotImplementedError
 
 
 def person_id_for_name(name):
