@@ -36,3 +36,13 @@ class QueueFrontier(StackFrontier):
             node = self.frontier[0]
             self.frontier = self.frontier[1:]
             return node
+
+class Explored():
+    def __init__(self):
+        self.list=[]
+    
+    def add(self,node):
+        self.list.append(node)
+
+    def contains(self, state):
+        return any(i.state == state for i in self.list)
