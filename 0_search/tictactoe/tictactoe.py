@@ -44,7 +44,7 @@ def actions(board):
     for i in range(3):
         for j in range(3):
             if board[i][j] == EMPTY:
-                listactions.append((i,j))
+                listactions.append((i, j))
     return listactions
 
 
@@ -127,7 +127,7 @@ def minimax(board):
     Returns the optimal action for the current player on the board.
     """
     
-    if player(board) == X: # MAX
+    if player(board) == X:  # MAX
         v = -99
         for action in actions(board):
             val = min_value(result(board, action))
@@ -137,8 +137,7 @@ def minimax(board):
             elif val == v:
                 options.append(action)
            
-
-    elif player(board) == O: # MIN
+    elif player(board) == O:  # MIN
         v = 99
         for action in actions(board):
             val = max_value(result(board, action))
@@ -152,6 +151,9 @@ def minimax(board):
 
 
 def max_value(board):
+    """
+    Returns the maximun possible points for the current player on the board.
+    """
     if terminal(board):
         return utility(board)   
     v = -99
@@ -161,6 +163,9 @@ def max_value(board):
 
 
 def min_value(board):
+    """
+    Returns the minimun possible points for the current player on the board.
+    """
     if terminal(board):
         return utility(board)
     v = 99
