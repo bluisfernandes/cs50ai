@@ -4,6 +4,7 @@ Tic Tac Toe Player
 
 import math
 import copy
+from random import random, randrange
 
 X = "X"
 O = "O"
@@ -113,7 +114,6 @@ def utility(board):
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
     userwinner = winner(board)
-    print(f"User winner is {userwinner}")
     if userwinner == X:
         return 1
     elif userwinner == O:
@@ -126,6 +126,44 @@ def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    print(f"minimax{actions(board)[0]}")
-    return actions(board)[0]
-    # raise NotImplementedError
+    
+    if player(board) == X: # MAX
+        v = -99
+        for action in actions(board):
+            val = min_value(result(board, action))
+            if val > v:
+                options = [action]
+                v = val
+            elif val == v:
+                options.append(action)
+           
+
+    elif player(board) == O: # MIN
+        v = 99
+        for action in actions(board):
+            val = max_value(result(board, action))
+            if val < v:
+                options = [action]
+                v = val
+            elif val == v:
+                options.append(action)
+            
+    return options[randrange(len(options))]
+
+
+def max_value(board):
+    if terminal(board):
+        return utility(board)   
+    v = -99
+    for action in actions(board):
+        v = max(v, min_value(result(board, action)))
+    return v
+
+
+def min_value(board):
+    if terminal(board):
+        return utility(board)
+    v = 99
+    for action in actions(board):
+        v = min(v, max_value(result(board, action)))
+    return v
