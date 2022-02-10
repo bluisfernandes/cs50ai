@@ -112,7 +112,18 @@ while True:
         if user != player and not game_over:
             if ai_turn:
                 time.sleep(0.5)
+                # time and count
+                import timeit
+                start = timeit.default_timer()
+                
                 move = ttt.minimax(board)
+                
+                # time and count
+                stop = timeit.default_timer()
+                print(f"=>{ttt.count}")
+                ttt.count = 0
+                print('Time: ', stop - start)
+                  
                 board = ttt.result(board, move)
                 ai_turn = False
             else:

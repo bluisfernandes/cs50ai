@@ -9,7 +9,7 @@ from random import random, randrange
 X = "X"
 O = "O"
 EMPTY = None
-
+count =0
 
 def initial_state():
     """
@@ -130,7 +130,7 @@ def minimax(board):
     if player(board) == X:  # MAX
         v = -99
         for action in actions(board):
-            val = min_value(result(board, action))
+            val = min_value(result(board, action), -99)
             if val > v:
                 options = [action]
                 v = val
@@ -140,7 +140,7 @@ def minimax(board):
     elif player(board) == O:  # MIN
         v = 99
         for action in actions(board):
-            val = max_value(result(board, action))
+            val = max_value(result(board, action), 99)
             if val < v:
                 options = [action]
                 v = val
@@ -150,25 +150,34 @@ def minimax(board):
     return options[randrange(len(options))]
 
 
-def max_value(board):
+def max_value(board, ref):
     """
-    Returns the maximun possible points for the current player on the board.
+    Returns the maximun possible points for the current player on the board, with alpha-beta Pruning
     """
     if terminal(board):
         return utility(board)   
     v = -99
     for action in actions(board):
-        v = max(v, min_value(result(board, action)))
+        v = max(v, min_value(result(board, action),v))
+        global count
+        count += 1
+        if v > ref:
+            break
+        
     return v
 
 
-def min_value(board):
+def min_value(board, ref):
     """
-    Returns the minimun possible points for the current player on the board.
+    Returns the minimun possible points for the current player on the board, with alpha-beta Pruning
     """
     if terminal(board):
         return utility(board)
     v = 99
     for action in actions(board):
-        v = min(v, max_value(result(board, action)))
+        v = min(v, max_value(result(board, action),v))
+        global count
+        count += 1
+        if v < ref:
+            break
     return v
