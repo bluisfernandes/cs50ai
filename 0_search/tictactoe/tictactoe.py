@@ -130,27 +130,39 @@ def minimax(board):
     if player(board) == X:  # MAX
         v = -99
         for action in actions(board):
-            val = min_value(result(board, action), -99)
+            val = min_value(result(board, action))
+            print(f"X\t>{action} |val= {val}| v= {v}", end="")
             if val > v:
                 options = [action]
                 v = val
+                print(f"(val>v)-> v = {v}")
             elif val == v:
                 options.append(action)
+                print()
+            else:
+                print()
            
     elif player(board) == O:  # MIN
         v = 99
         for action in actions(board):
-            val = max_value(result(board, action), 99)
+            val = max_value(result(board, action),  ref=99)
+            # print(val)
+            print(f"O\t>{action} |val= {val}| v= {v}", end="")
             if val < v:
                 options = [action]
                 v = val
+                print(f"(val<v)-> v = {v}")
             elif val == v:
                 options.append(action)
-            
+                print()
+            else:
+                print()
+    
+    print(f"options(O): {options}")      
     return options[randrange(len(options))]
 
 
-def max_value(board, ref):
+def max_value(board, ref=-99):
     """
     Returns the maximun possible points for the current player on the board, with alpha-beta Pruning
     """
@@ -158,16 +170,19 @@ def max_value(board, ref):
         return utility(board)   
     v = -99
     for action in actions(board):
+        # print(f"v0={v}\tv=", end="")
         v = max(v, min_value(result(board, action),v))
+        # print(v,end="")
+        # print("#",end="")
         global count
         count += 1
-        if v > ref:
+        if v < ref:
+            # print("|")
             break
-        
     return v
 
 
-def min_value(board, ref):
+def min_value(board, ref=99):
     """
     Returns the minimun possible points for the current player on the board, with alpha-beta Pruning
     """
@@ -178,6 +193,6 @@ def min_value(board, ref):
         v = min(v, max_value(result(board, action),v))
         global count
         count += 1
-        if v < ref:
+        if v > ref:
             break
     return v
