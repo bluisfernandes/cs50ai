@@ -31,7 +31,7 @@ knowledge1 = And(
     
     # A says "We are both knaves."
     Implication(AKnight, And(AKnave, BKnave)),
-    Implication(AKnave,Not(And(AKnave, BKnave)))
+    Implication(AKnave, Not(And(AKnave, BKnave)))
 )
 
 # Puzzle 2
@@ -44,11 +44,11 @@ knowledge2 = And(
     Not(And(BKnight, BKnave)),  # B can only be a knight or knave
     
     # A says "We are the same kind."
-    Implication(AKnight,Or(And(AKnight, AKnight),And(AKnave, BKnave))),
-    Implication(AKnave,Not(Or(And(AKnight, AKnight),And(AKnave, BKnave)))),
+    Implication(AKnight, Or(And(AKnight, AKnight), And(AKnave, BKnave))),
+    Implication(AKnave, Not(Or(And(AKnight, AKnight), And(AKnave, BKnave)))),
     # B says "We are of different kinds."
-    Implication(BKnight,Or(And(AKnight, BKnave), And(AKnave, BKnight))),
-    Implication(BKnave,Not(Or(And(AKnight, BKnave), And(AKnave, BKnight))))
+    Implication(BKnight, Or(And(AKnight, BKnave), And(AKnave, BKnight))),
+    Implication(BKnave, Not(Or(And(AKnight, BKnave), And(AKnave, BKnight))))
 
 
    
@@ -71,7 +71,7 @@ knowledge3 = And(
     Implication(BKnight, Not(AKnave)),
     
     # B says "C is a knave."
-    Implication(BKnight,CKnave),
+    Implication(BKnight, CKnave),
     Implication(BKnave, Not(CKnave)),
 
     # C says "A is a knight."
