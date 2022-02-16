@@ -197,7 +197,7 @@ class MinesweeperAI():
         #    based on the value of `cell` and `count`
         cells = self.neighbor_cells(cell)
         if len(cells) > 0:
-            self.knowledge.append(Sentence(cells,count))
+            self.knowledge.append(Sentence(cells, count))
 
         # 4) mark any additional cells as safe or as mines
         #    if it can be concluded based on the AI's knowledge base
@@ -206,7 +206,6 @@ class MinesweeperAI():
         while loop_ai:
             loop_ai = self.update_ai()
  
-
     def update_ai(self):
         for k, sentence in enumerate(self.knowledge):
             for k0 in range(k, len(self.knowledge)):
@@ -220,21 +219,22 @@ class MinesweeperAI():
                     continue
                 
                 if(set1.cells <= set2.cells):
-                    self.subset(set1,set2)
+                    self.subset(set1, set2)
                     return True
                  
                 if(set1.cells >= set2.cells):
-                    self.subset(set2,set1)
+                    self.subset(set2, set1)
                     return True
         return False
-
-
+   
     def subset(self, set1, set2):
+        """ 
+        Updates the 'cells' and 'count' of set2, removing this subset set1
+        """
         for cell in set1.cells:
             set2.cells.remove(cell)
             
         set2.count -= set1.count
-
 
     def make_safe_move(self):
         """
@@ -246,15 +246,13 @@ class MinesweeperAI():
         and self.moves_made, but should not modify any of those values.
         """
         for sentence in self.knowledge:
-           
             cells = sentence.known_safes()
             
             while cells:
-                cell= cells.pop()
+                cell = cells.pop()
                 if cell not in self.mines and cell not in self.moves_made:
                     return cell
         return None
-
 
     def make_random_move(self):
         """
@@ -266,23 +264,22 @@ class MinesweeperAI():
         while True:
             i = random.randrange(self.height)
             j = random.randrange(self.width)
-            if (i,j) not in self.moves_made and (i,j) not in self.mines:
-                return (i,j)
+            if (i, j) not in self.moves_made and (i, j) not in self.mines:
+                return (i, j)
 
-    
     def neighbor_cells(self, cell):
         """
         Returns all not used neighbor cells from cell
         """
         cells = set()
-        for i in range(cell[0]-1,cell[0]+2):
-            for j in range(cell[1]-1,cell[1]+2):
+        for i in range(cell[0]-1, cell[0]+2):
+            for j in range(cell[1]-1, cell[1]+2):
 
-                if (i,j) == cell:
+                if (i, j) == cell:
                     continue
 
                 if i >= 0 and i < self.height:
                     if j >= 0 and j < self.width:
-                        if (i,j) not in self.moves_made:
-                            cells.add((i,j))
+                        if (i, j) not in self.moves_made:
+                            cells.add((i, j))
         return cells
