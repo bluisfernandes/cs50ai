@@ -19,6 +19,7 @@ def main():
     print()
     # here *************
     ranks = sample_pagerank(corpus, DAMPING, SAMPLES)
+    print(ranks)
     print(f"PageRank Results from Sampling (n = {SAMPLES})")
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
@@ -94,6 +95,15 @@ def sample_pagerank(corpus, damping_factor, n):
     PageRank values should sum to 1.
     """
     pg = {page:0 for page in corpus}
+    page = random.choices(list(corpus.keys()))[0]
+    weights = transition_model(corpus, page, damping_factor)
+    print(weights)
+    print(list(weights.values()))
+
+    for i in range(n):
+        pg
+
+    return pg 
     # raise NotImplementedError
 
 
@@ -107,6 +117,8 @@ def iterate_pagerank(corpus, damping_factor):
     PageRank values should sum to 1.
     """
     pg = {page:0 for page in corpus}
+
+    return pg
     # raise NotImplementedError
 
 
