@@ -11,15 +11,7 @@ def main():
     if len(sys.argv) != 2:
         sys.exit("Usage: python pagerank.py corpus")
     corpus = crawl(sys.argv[1])
-    # here *************
-    for corp in corpus:
-        print(f"  {corp}:  \t{corpus[corp]}")
-    tran = transition_model(corpus, list(corpus.keys())[2], DAMPING)
-    print(tran)
-    print()
-    # here *************
     ranks = sample_pagerank(corpus, DAMPING, SAMPLES)
-    print(ranks)
     print(f"PageRank Results from Sampling (n = {SAMPLES})")
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
@@ -66,7 +58,7 @@ def transition_model(corpus, page, damping_factor):
     a link at random chosen from all pages in the corpus.
     """
     # initializes prob with all pages
-    prob = {page:0 for page in corpus}
+    prob = {page: 0 for page in corpus}
 
     # if there is no link, random to each one and return
     if len(corpus[page]) == 0:
@@ -95,7 +87,7 @@ def sample_pagerank(corpus, damping_factor, n):
     PageRank values should sum to 1.
     """
     # creates a counter and population
-    pg_count = {page:0 for page in corpus}
+    pg_count = {page: 0 for page in corpus}
     population = list(corpus.keys())
 
     # choose first page randomnly
@@ -107,9 +99,8 @@ def sample_pagerank(corpus, damping_factor, n):
         page = random.choices(population, weights=weights, k=1)[0]
         pg_count[page] += 1  
 
-    sample = {page:pg_count[page]/n for page in pg_count}
+    sample = {page: pg_count[page]/n for page in pg_count}
     return sample 
-
 
 
 def iterate_pagerank(corpus, damping_factor):
@@ -121,10 +112,37 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    pg = {page:0 for page in corpus}
+    # Add links to all pages when there is no one
+    for i in corpus:
+        if len(corpus[i]) == 0:
+            corpus[i] = set(p for p in corpus)
 
+    n = len(corpus)
+    pg = {page: 1/n for page in corpus}
+
+    accurate = 0.001
+
+    while True:
+        out = True
+        for p in list(pg.keys()):
+            x = pr(corpus, p, n, pg, damping_factor)
+
+            # if diff > accurate, recalcultes
+            if abs(x - pg[p]) > accurate:
+                pg[p] = x
+                out = False
+            pg[p] = x
+        if out:
+            break
     return pg
-    # raise NotImplementedError
+
+
+def pr(corpus, p, n, pg, damping_factor):
+    damping_factor
+
+    pr = (1 - damping_factor) / n + damping_factor * sum([pg[i] / len(corpus[i]) for i in corpus if p in corpus[i]]) 
+
+    return pr
 
 
 if __name__ == "__main__":
