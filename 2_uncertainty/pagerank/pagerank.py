@@ -127,9 +127,8 @@ def iterate_pagerank(corpus, damping_factor):
         for p in list(pg.keys()):
             x = pr(corpus, p, n, pg, damping_factor)
 
-            # if diff > accurate, recalcultes
+            # if diff > accurate, recalculte
             if abs(x - pg[p]) > accurate:
-                pg[p] = x
                 out = False
             pg[p] = x
         if out:
