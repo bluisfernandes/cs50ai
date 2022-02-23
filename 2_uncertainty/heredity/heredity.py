@@ -103,12 +103,6 @@ def main():
                 p = probabilities[person][field][value]
                 print(f"    {value}: {p:.4f}")
 
-    # print(f"{PROBS['gene'][0]}")
-    # for name in people:
-    #     print(name)
-    # print(22*"-")
-    # print(joint_probability(people, {"Harry"}, {"James"}, {"James"}))
-
 
 def load_data(filename):
     """
@@ -155,7 +149,7 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    genes={}
+    genes = {}
     for person in people:
         if person in one_gene:
             n = 1
@@ -163,7 +157,7 @@ def joint_probability(people, one_gene, two_genes, have_trait):
             n = 2
         else:
             n = 0
-        genes.update({person:{"genes" : n, "trait" : person in have_trait}})
+        genes.update({person: {"genes": n, "trait": person in have_trait}})
 
     p = []
 
@@ -183,13 +177,13 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         else:
             pfather = PROB_GEN[genes[father]["genes"]]
             pmother = PROB_GEN[genes[mother]["genes"]]
-            pchild=[]
+            pchild = []
 
             # When person has 0 genes
             if genes[person]["genes"] == 0:
                 pchild.append((1 - pfather)*(1 - pmother))
 
-            # When person has 0 genes
+            # When person has 1 genes
             elif genes[person]["genes"] == 1:
                 pchild.append(pfather*(1 - pmother) + (1 - pfather)*pmother)
 
@@ -197,7 +191,7 @@ def joint_probability(people, one_gene, two_genes, have_trait):
             else:
                 pchild.append(pfather * pmother)
         
-            #probability to have the trait
+            # probability to have the trait
             pchild.append(PROBS["trait"][n][trait])
             
             # append value to probability
@@ -213,8 +207,7 @@ def update(probabilities, one_gene, two_genes, have_trait, p):
     Which value for each distribution is updated depends on whether
     the person is in `have_gene` and `have_trait`, respectively.
     """
-
-    for person in one_gene | two_genes | have_trait:
+    for person in probabilities:
         if person in one_gene:
             n = 1
         elif person in two_genes:
@@ -231,8 +224,6 @@ def normalize(probabilities):
     Update `probabilities` such that each probability distribution
     is normalized (i.e., sums to 1, with relative proportions the same).
     """
-    # print(f"{probabilities=}")
-
     for person in probabilities:
         g = 0
         t = 0
@@ -251,9 +242,7 @@ def normalize(probabilities):
         # Updates trait values
         for val in probabilities[person]["trait"]:
             probabilities[person]["trait"][val] = probabilities[person]["trait"][val] / t
-        
 
 
-    
 if __name__ == "__main__":
     main()
