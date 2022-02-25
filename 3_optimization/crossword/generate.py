@@ -99,8 +99,13 @@ class CrosswordCreator():
         (Remove any values that are inconsistent with a variable's unary
          constraints; in this case, the length of the word.)
         """
-        # raise NotImplementedError
-
+    
+        for var in self.domains:
+            domain = self.domains[var].copy()
+            for word in domain:
+                if len(word) != var.length:
+                    self.domains[var].remove(word)        
+        
     def revise(self, x, y):
         """
         Make variable `x` arc consistent with variable `y`.
@@ -172,11 +177,11 @@ class CrosswordCreator():
 
         If no assignment is possible, return None.
         """
-        for word in self.crossword.variables:
-            if word.length == 3:
-                assignment[word] = "TEN"
-        # print(self.crossword.variables)
-        return assignment
+        # for word in self.crossword.variables:
+        #     if word.length == 3:
+        #         assignment[word] = "TEN"
+        # # print(self.crossword.variables)
+        # return assignment
         # raise NotImplementedError
 
 
