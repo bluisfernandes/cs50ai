@@ -158,6 +158,9 @@ class CrosswordCreator():
         Return True if `assignment` is complete (i.e., assigns a value to each
         crossword variable); return False otherwise.
         """
+        for var in self.crossword.variables:
+            if var not in assignment:
+                return False
         return True
         # raise NotImplementedError
 
@@ -204,6 +207,7 @@ class CrosswordCreator():
             if word.length == 3:
                 assignment[word] = "SIX"
         assignment[Variable(0, 1, 'down', 5)] = "SEVEN"
+        print(f"{self.assignment_complete(assignment)=}")
         # print(self.crossword.variables)
         return assignment
         # raise NotImplementedError
