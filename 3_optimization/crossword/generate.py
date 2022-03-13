@@ -169,8 +169,26 @@ class CrosswordCreator():
         Return True if `assignment` is consistent (i.e., words fit in crossword
         puzzle without conflicting characters); return False otherwise.
         """
+        values = assignment.values()
+        
+        # checks repeated words
+        if len(values) != len(set(values)):
+            return False
+        
+        for assigned in assignment:
+            # checks words length
+            if assigned.length == len(assignment[assigned]):
+                return False
+
+            # checks the neighbors
+            for neigb in self.crossword.neighbors(assigned):
+                if neigb in assignment:
+                    pos_assign, pos_neigb = self.crossword.overlaps[(assigned,neigb)]
+                    # check the charachter in "pos_n"
+                    if assignment[assigned][pos_assign] != assignment[neigb][pos_neigb]:
+                        return False
         return True
-        # raise NotImplementedError
+
 
     def order_domain_values(self, var, assignment):
         """
@@ -205,9 +223,10 @@ class CrosswordCreator():
         """
         for word in self.crossword.variables:
             if word.length == 3:
-                assignment[word] = "SIX"
+                assignment[word] = "FIX"
         assignment[Variable(0, 1, 'down', 5)] = "SEVEN"
         print(f"{self.assignment_complete(assignment)=}")
+        print(f"{self.consistent(assignment)=}")
         # print(self.crossword.variables)
         return assignment
         # raise NotImplementedError
