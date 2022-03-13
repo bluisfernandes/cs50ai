@@ -99,7 +99,6 @@ class CrosswordCreator():
         (Remove any values that are inconsistent with a variable's unary
          constraints; in this case, the length of the word.)
         """
-    
         for var in self.domains:
             domain = self.domains[var].copy()
             for word in domain:
@@ -115,8 +114,20 @@ class CrosswordCreator():
         Return True if a revision was made to the domain of `x`; return
         False if no revision was made.
         """
-        return True
-        # raise NotImplementedError
+        # position of overlaps letters
+        px, py = self.crossword.overlaps[x,y]
+        letters_y = set(word[py] for word in self.domains[y])
+        
+        revised = False
+        domain = self.domains[x].copy()
+               
+        for word in domain:
+            # if letters is not coincidents
+            if word[px] not in letters_y:
+                self.domains[x].remove(word)
+                revised = True
+        return revised
+
 
     def ac3(self, arcs=None):
         """
@@ -177,11 +188,12 @@ class CrosswordCreator():
 
         If no assignment is possible, return None.
         """
-        # for word in self.crossword.variables:
-        #     if word.length == 3:
-        #         assignment[word] = "TEN"
-        # # print(self.crossword.variables)
-        # return assignment
+        for word in self.crossword.variables:
+            if word.length == 3:
+                assignment[word] = "SIX"
+        assignment[Variable(0, 1, 'down', 5)] = "SEVEN"
+        # print(self.crossword.variables)
+        return assignment
         # raise NotImplementedError
 
 
@@ -200,6 +212,15 @@ def main():
     crossword = Crossword(structure, words)
     creator = CrosswordCreator(crossword)
     assignment = creator.solve()
+
+    
+
+    # ***
+    print(f"{crossword.variables=}")
+    print(f"{creator.domains=}")
+    print(f"{crossword.neighbors(Variable(0, 1, 'across', 3))=}")
+    print(f"{crossword.overlaps[Variable(1, 4, 'down', 4),Variable(4, 1, 'across', 4)]=}")
+    # ***
 
     # Print result
     if assignment is None:
