@@ -138,6 +138,18 @@ class CrosswordCreator():
         Return True if arc consistency is enforced and no domains are empty;
         return False if one or more domains end up empty.
         """
+        if arcs == None:
+            queue = set(arc for arc in self.crossword.overlaps if self.crossword.overlaps[arc] is not None)
+        else:
+            queue = arcs
+        while queue:
+            x,y = queue.pop()
+            if self.revise(x,y):
+                if len(self.domains[x]) == 0:
+                    return False
+                for z in self.crossword.neighbors(x):
+                    if z != y:
+                        queue.add((z, x))
         return True
         # raise NotImplementedError
 
@@ -214,12 +226,13 @@ def main():
     assignment = creator.solve()
 
     
-
     # ***
-    print(f"{crossword.variables=}")
-    print(f"{creator.domains=}")
-    print(f"{crossword.neighbors(Variable(0, 1, 'across', 3))=}")
-    print(f"{crossword.overlaps[Variable(1, 4, 'down', 4),Variable(4, 1, 'across', 4)]=}")
+    # print(f"{crossword.variables=}")
+    # print(f"{creator.domains=}")
+    for variable, domain in creator.domains.items():
+        print(" ",variable, ":\t", domain)
+    # print(f"{crossword.neighbors(Variable(0, 1, 'across', 3))=}")
+    # print(f"{crossword.overlaps[Variable(1, 4, 'down', 4),Variable(4, 1, 'across', 4)]=}")
     # ***
 
     # Print result
