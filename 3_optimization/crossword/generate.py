@@ -197,9 +197,25 @@ class CrosswordCreator():
         The first value in the list, for example, should be the one
         that rules out the fewest values among the neighbors of `var`.
         """
-        values =[var[0]]
-        return values
-        # raise NotImplementedError
+        domains = {word :0 for word in self.domains[var]}
+        neighbors = self.crossword.neighbors(var)
+        valid_neighbors = neighbors - set(assignment)
+
+        for neighbor in valid_neighbors:
+            # position of overlaps letters
+            pos_var, pos_nei = self.crossword.overlaps[var,neighbor]
+
+            for word in domains:
+                letter_var = word[pos_var]
+                for neig_domain in self.domains[neighbor]:
+                    letter_nei = neig_domain[pos_nei]
+
+                    #if word incompatible with each neighbordomais count +1
+                    if letter_nei == letter_var:
+                        domains[word] += 1 
+
+        return sorted(domains, key = domains.__getitem__)
+   
 
     def select_unassigned_variable(self, assignment):
         """
@@ -221,12 +237,30 @@ class CrosswordCreator():
 
         If no assignment is possible, return None.
         """
-        for word in self.crossword.variables:
-            if word.length == 3:
-                assignment[word] = "FIX"
-        assignment[Variable(0, 1, 'down', 5)] = "SEVEN"
-        print(f"{self.assignment_complete(assignment)=}")
-        print(f"{self.consistent(assignment)=}")
+        # for word in self.crossword.variables:
+        #     if word.length == 3:
+        #         assignment[word] = "SIX"
+
+        x = Variable(0, 1, 'down', 5)
+        
+        
+        
+        # assignment[x] = "SEVEN"
+        x = Variable(1, 7, 'down', 7)
+        assignment[x] = "MINIMAX"
+
+        # y = Variable(2, 1, 'across', 12)
+        # assignment[y] = "INTELLIGENCE"
+
+        y = Variable(4, 4, 'across', 5)
+        assignment[y] = "LOGIC"
+
+        # w = Variable(6, 5, 'across', 6)
+        w = Variable(2, 1, 'across', 12)
+        
+        print(self.order_domain_values(w, assignment))
+        # print(f"{self.assignment_complete(assignment)=}")
+        # print(f"{self.consistent(assignment)=}")
         # print(self.crossword.variables)
         return assignment
         # raise NotImplementedError
