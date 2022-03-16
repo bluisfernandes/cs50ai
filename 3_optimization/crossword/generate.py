@@ -1,3 +1,4 @@
+from sre_constants import FAILURE
 import sys
 
 from crossword import *
@@ -115,7 +116,7 @@ class CrosswordCreator():
         False if no revision was made.
         """
         # position of overlaps letters
-        px, py = self.crossword.overlaps[x,y]
+        px, py = self.crossword.overlaps[x, y]
         letters_y = set(word[py] for word in self.domains[y])
         
         revised = False
@@ -127,7 +128,6 @@ class CrosswordCreator():
                 self.domains[x].remove(word)
                 revised = True
         return revised
-
 
     def ac3(self, arcs=None):
         """
@@ -143,8 +143,8 @@ class CrosswordCreator():
         else:
             queue = arcs
         while queue:
-            x,y = queue.pop()
-            if self.revise(x,y):
+            x, y = queue.pop()
+            if self.revise(x, y):
                 if len(self.domains[x]) == 0:
                     return False
                 for z in self.crossword.neighbors(x):
@@ -177,18 +177,17 @@ class CrosswordCreator():
         
         for assigned in assignment:
             # checks words length
-            if assigned.length == len(assignment[assigned]):
+            if assigned.length != len(assignment[assigned]):
                 return False
 
             # checks the neighbors
             for neigb in self.crossword.neighbors(assigned):
                 if neigb in assignment:
-                    pos_assign, pos_neigb = self.crossword.overlaps[(assigned,neigb)]
+                    pos_assign, pos_neigb = self.crossword.overlaps[(assigned, neigb)]
                     # check the charachter in "pos_n"
                     if assignment[assigned][pos_assign] != assignment[neigb][pos_neigb]:
                         return False
         return True
-
 
     def order_domain_values(self, var, assignment):
         """
@@ -197,26 +196,25 @@ class CrosswordCreator():
         The first value in the list, for example, should be the one
         that rules out the fewest values among the neighbors of `var`.
         """
-        domains = {word :0 for word in self.domains[var]}
+        domains = {word: 0 for word in self.domains[var]}
         neighbors = self.crossword.neighbors(var)
         valid_neighbors = neighbors - set(assignment)
 
         for neighbor in valid_neighbors:
             # position of overlaps letters
-            pos_var, pos_nei = self.crossword.overlaps[var,neighbor]
+            pos_var, pos_nei = self.crossword.overlaps[var, neighbor]
 
             for word in domains:
                 letter_var = word[pos_var]
                 for neig_domain in self.domains[neighbor]:
                     letter_nei = neig_domain[pos_nei]
 
-                    #if word incompatible with each neighbordomais count +1
+                    # if word incompatible with each neighbordomais count +1
                     if letter_nei == letter_var:
                         domains[word] += 1 
 
-        return sorted(domains, key = domains.__getitem__)
+        return sorted(domains, key=domains.__getitem__)
    
-
     def select_unassigned_variable(self, assignment):
         """
         Return an unassigned variable not already part of `assignment`.
@@ -225,16 +223,15 @@ class CrosswordCreator():
         degree. If there is a tie, any of the tied variables are acceptable
         return values.
         """
-        unassigned = {var:{"domain":0, "degree":0} for var in self.crossword.variables - set(assignment)}
+        unassigned = {var: {"domain": 0, "degree": 0} for var in self.crossword.variables - set(assignment)}
         for var in unassigned:
             unassigned[var]["domain"] = len(self.domains[var])
             unassigned[var]["degree"] = len(self.crossword.neighbors(var))
 
-        s = sorted(unassigned, key= lambda x: unassigned[x]["degree"], reverse=True)
-        s = sorted(s, key= lambda x: unassigned[x]["domain"])
+        s = sorted(unassigned, key=lambda x: unassigned[x]["degree"], reverse=True)
+        s = sorted(s, key=lambda x: unassigned[x]["domain"])
 
         return s[0]
-
 
     def backtrack(self, assignment):
         """
@@ -245,34 +242,20 @@ class CrosswordCreator():
 
         If no assignment is possible, return None.
         """
-        # for word in self.crossword.variables:
-        #     if word.length == 3:
-        #         assignment[word] = "SIX"
-
-        x = Variable(0, 1, 'down', 5)
+        if self.assignment_complete(assignment):
+            return assignment
         
-        
-        
-        # assignment[x] = "SEVEN"
-        x = Variable(1, 7, 'down', 7)
-        assignment[x] = "MINIMAX"
+        var = self.select_unassigned_variable(assignment)
+        for value in self.order_domain_values(var=var, assignment=assignment):
+            assignment[var] = value
 
-        # y = Variable(2, 1, 'across', 12)
-        # assignment[y] = "INTELLIGENCE"
-
-        y = Variable(4, 4, 'across', 5)
-        assignment[y] = "LOGIC"
-
-        # w = Variable(6, 5, 'across', 6)
-        w = Variable(2, 1, 'across', 12)
-        
-        # print(self.order_domain_values(w, assignment))
-        # print(self.select_unassigned_variable(assignment))
-        # print(f"{self.assignment_complete(assignment)=}")
-        # print(f"{self.consistent(assignment)=}")
-        # print(self.crossword.variables)
-        return assignment
-        # raise NotImplementedError
+            if self.consistent(assignment):
+    
+                result = self.backtrack(assignment)
+                if result is not None:
+                    return result
+            assignment.pop(var)
+        return None
 
 
 def main():
@@ -291,15 +274,8 @@ def main():
     creator = CrosswordCreator(crossword)
     assignment = creator.solve()
 
-    
-    # ***
-    # print(f"{crossword.variables=}")
-    # print(f"{creator.domains=}")
-    for variable, domain in creator.domains.items():
-        print(" ",variable, ":\t", domain)
-    # print(f"{crossword.neighbors(Variable(0, 1, 'across', 3))=}")
-    # print(f"{crossword.overlaps[Variable(1, 4, 'down', 4),Variable(4, 1, 'across', 4)]=}")
-    # ***
+    # for variable, domain in creator.domains.items():
+    #     print(" ", variable, ":\t", domain)
 
     # Print result
     if assignment is None:
