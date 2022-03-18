@@ -1,8 +1,8 @@
 import csv
 import sys
 
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
+# from sklearn.model_selection import train_test_split
+# from sklearn.neighbors import KNeighborsClassifier
 
 TEST_SIZE = 0.4
 
@@ -59,7 +59,72 @@ def load_data(filename):
     labels should be the corresponding list of labels, where each label
     is 1 if Revenue is true, and 0 otherwise.
     """
-    raise NotImplementedError
+    dict_month ={"Jan" : 0,
+            "Feb" : 1,
+            "Mar" : 2,
+            "Apr" : 3,
+            "May" : 4,
+            "June" : 5,
+            "Jul" : 6,
+            "Aug" : 7,
+            "Sep" : 8,
+            "Oct" : 9,
+            "Nov" : 10,
+            "Dec" : 11,
+            "Returning_Visitor" : 1,
+            "FALSE" : 0,
+            "TRUE" : 1}
+    
+    head_int = ("Administrative",
+                "Informational",
+                "ProductRelated",
+                "Month",
+                "OperatingSystems",
+                "Browser",
+                "Region",
+                "TrafficType")
+                # "VisitorType",
+                # "Weekend")
+    
+    head_float = ("Administrative_Duration",
+                "Informational_Duration",
+                "ProductRelated_Duration",
+                "BounceRates",
+                "ExitRates",
+                "PageValues",
+                "SpecialDay")
+    
+    head_dict = ("Weekend",
+                "VisitorType",
+                "Month")
+    
+    evidence = []
+    labels = []
+
+    with open(filename, "r") as f:
+        file = csv.reader(f)
+        for row in file:
+            evidence.append(row[:17])
+            labels.append(row[17])
+
+    head = evidence.pop(0)
+    labels.pop(0)
+
+    for i, row in enumerate(evidence):
+        for j, (data, headname) in enumerate(zip(row, head)):
+            if headname in head_dict:
+                evidence[i][j] = dict_month.get(data, 0)
+                       
+            elif headname in head_float:
+                evidence[i][j] = float(data)
+            
+            elif headname in head_int:
+                evidence[i][j] = int(data)
+    
+    for i, row in enumerate(labels):
+        labels[i] = dict_month[row]
+
+    return (evidence, labels)
 
 
 def train_model(evidence, labels):
