@@ -1,8 +1,9 @@
 import csv
 import sys
+import numpy as np
 
-# from sklearn.model_selection import train_test_split
-# from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
 
 TEST_SIZE = 0.4
 
@@ -59,22 +60,25 @@ def load_data(filename):
     labels should be the corresponding list of labels, where each label
     is 1 if Revenue is true, and 0 otherwise.
     """
-    dict_month ={"Jan" : 0,
-            "Feb" : 1,
-            "Mar" : 2,
-            "Apr" : 3,
-            "May" : 4,
-            "June" : 5,
-            "Jul" : 6,
-            "Aug" : 7,
-            "Sep" : 8,
-            "Oct" : 9,
-            "Nov" : 10,
-            "Dec" : 11,
-            "Returning_Visitor" : 1,
-            "FALSE" : 0,
-            "TRUE" : 1}
-    
+
+    # words that shall be replaced by a number
+    dict_month = {"Jan": 0,
+                  "Feb": 1,
+                  "Mar": 2,
+                  "Apr": 3,
+                  "May": 4,
+                  "June": 5,
+                  "Jul": 6,
+                  "Aug": 7,
+                  "Sep": 8,
+                  "Oct": 9,
+                  "Nov": 10,
+                  "Dec": 11,
+                  "Returning_Visitor": 1,
+                  "FALSE": 0,
+                  "TRUE": 1}
+
+    # Columns that shloud be replaced by a integer
     head_int = ("Administrative",
                 "Informational",
                 "ProductRelated",
@@ -83,20 +87,20 @@ def load_data(filename):
                 "Browser",
                 "Region",
                 "TrafficType")
-                # "VisitorType",
-                # "Weekend")
     
+    # Columns that should be replaced by a float
     head_float = ("Administrative_Duration",
-                "Informational_Duration",
-                "ProductRelated_Duration",
-                "BounceRates",
-                "ExitRates",
-                "PageValues",
-                "SpecialDay")
-    
+                  "Informational_Duration",
+                  "ProductRelated_Duration",
+                  "BounceRates",
+                  "ExitRates",
+                  "PageValues",
+                  "SpecialDay")
+
+    # Columns that the word should be replaced by a dictionary
     head_dict = ("Weekend",
-                "VisitorType",
-                "Month")
+                 "VisitorType",
+                 "Month")
     
     evidence = []
     labels = []
@@ -107,9 +111,11 @@ def load_data(filename):
             evidence.append(row[:17])
             labels.append(row[17])
 
+    # remove head
     head = evidence.pop(0)
     labels.pop(0)
 
+    # convert each cell of evidence by a expected format value
     for i, row in enumerate(evidence):
         for j, (data, headname) in enumerate(zip(row, head)):
             if headname in head_dict:
@@ -121,6 +127,7 @@ def load_data(filename):
             elif headname in head_int:
                 evidence[i][j] = int(data)
     
+    # convert labels value to 0/1
     for i, row in enumerate(labels):
         labels[i] = dict_month[row]
 
@@ -132,7 +139,8 @@ def train_model(evidence, labels):
     Given a list of evidence lists and a list of labels, return a
     fitted k-nearest neighbor model (k=1) trained on the data.
     """
-    raise NotImplementedError
+    model = KNeighborsClassifier(n_neighbors=1)
+    return model.fit(evidence, labels)
 
 
 def evaluate(labels, predictions):
@@ -150,7 +158,33 @@ def evaluate(labels, predictions):
     representing the "true negative rate": the proportion of
     actual negative labels that were accurately identified.
     """
-    raise NotImplementedError
+    
+    # counter values
+    sensitivity = 0
+    sensitivity_count = 0
+    specificity = 0
+    specificity_count = 0
+
+    # count each value
+    for i, _ in enumerate(zip(labels, predictions)):
+        if labels[i] == 1:
+            sensitivity_count += 1
+        else: 
+            specificity_count += 1
+            
+        if labels[i] == predictions[i]:
+            if labels[i] == 1:
+                sensitivity += 1
+            else:
+                specificity += 1
+
+    # floating-point value from 0 to 1 representing the “true positive rate”        
+    sensitivity = sensitivity / sensitivity_count
+    
+    # floating-point value from 0 to 1 representing the “true negative rate”
+    specificity = specificity / specificity_count
+
+    return (sensitivity, specificity)
 
 
 if __name__ == "__main__":
