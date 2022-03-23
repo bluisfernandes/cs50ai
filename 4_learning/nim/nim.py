@@ -101,8 +101,9 @@ class NimAI():
         Return the Q-value for the state `state` and the action `action`.
         If no Q-value exists yet in `self.q`, return 0.
         """
-        raise NotImplementedError
-
+        
+        return self.q.get((tuple(state), action), 0)
+        
     def update_q_value(self, state, action, old_q, reward, future_rewards):
         """
         Update the Q-value for the state `state` and the action `action`
@@ -118,8 +119,9 @@ class NimAI():
         `alpha` is the learning rate, and `new value estimate`
         is the sum of the current reward and estimated future rewards.
         """
-        raise NotImplementedError
-
+        s_a = (tuple(state), action)
+        self.q[s_a] = old_q + self.alpha * (reward + future_rewards - old_q)
+        
     def best_future_reward(self, state):
         """
         Given a state `state`, consider all possible `(state, action)`
@@ -130,8 +132,15 @@ class NimAI():
         Q-value in `self.q`. If there are no available actions in
         `state`, return 0.
         """
-        raise NotImplementedError
+        actions = Nim.available_actions(state)
+        
+        if len(actions) == 0:
+            return 0
+        
+        rewards = [reward for reward in [self.q.get((tuple(state), a), 0) for a in actions]]
 
+        return max(rewards)
+        
     def choose_action(self, state, epsilon=True):
         """
         Given a state `state`, return an action `(i, j)` to take.
@@ -147,7 +156,30 @@ class NimAI():
         If multiple actions have the same Q-value, any of those
         options is an acceptable return value.
         """
-        raise NotImplementedError
+        if epsilon == False:
+            epsilon = 0
+        else:
+            epsilon = self.epsilon
+
+        actions = Nim.available_actions(state)
+        prob = (1 - epsilon) / len(actions)
+        rewards = {action: {"reward": self.q.get((tuple(state), action), 0), "probability": prob} for action in actions}
+        max_reward = self.best_future_reward(state)
+        
+        counter = 0
+        for action in rewards:
+            if rewards[action]["reward"] == max_reward:
+                counter += 1
+        
+        for action in rewards:
+            if rewards[action]["reward"] == max_reward:
+                rewards[action]["probability"] = epsilon / counter
+            else:
+                rewards[action]["probability"] = (1 - epsilon) / (len(actions) - counter)
+
+        action = random.choices(list(rewards.keys()), [re["probability"] for re in rewards.values()])[0]
+
+        return action
 
 
 def train(n):
@@ -204,6 +236,10 @@ def train(n):
                 )
 
     print("Done training")
+    # print best moves for a state
+    # q = player.q
+    # l = {a: q[(s, a)] for (s, a),_ in sorted(q.items(), key=lambda elem: elem[1] ) if s == (1, 2, 1, 2)}
+    # print(l)
 
     # Return the trained AI
     return player
